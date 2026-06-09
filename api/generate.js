@@ -1,39 +1,46 @@
-// Fonction serverless Vercel — proxy sécurisé vers l'API Anthropic.
-// La clé API reste SECRÈTE côté serveur (jamais exposée au navigateur).
+// Fonction serverless Vercel — proxy GRATUIT vers Google Gemini.
+// La clé reste SECRÈTE côté serveur (jamais exposée au navigateur).
 //
-// Configuration : dans Vercel → Settings → Environment Variables
-//   ANTHROPIC_API_KEY = sk-ant-...   (ta clé Anthropic)
-//   (optionnel) ANTHROPIC_MODEL = claude-sonnet-4-20250514
+// Configuration : Vercel → projet com-fy → Settings → Environment Variables
+//   GEMINI_API_KEY = AIza...   (ta clé gratuite depuis aistudio.google.com)
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: "ANTHROPIC_API_KEY manquante (variable d'environnement)." });
+    return res.status(500).json({ error: "GEMINI_API_KEY manquante (variable d'environnement)." });
   }
 
-  const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-20250514";
+  const model = process.env.GEMINI_MODEL || "gemini-1.5-flash";
 
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: body.max_tokens || 600,
-        messages: body.messages,
-      }),
-    });
+    // On récupère le texte du prompt envoyé par l'appli
+    const userText = (body.messages && body.messages[0] && body.messages[0].content) || "";
+
+    const r = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: userText }] }],
+          generationConfig: { maxOutputTokens: body.max_tokens || 600, temperature: 0.9 },
+        }),
+      }
+    );
     const data = await r.json();
-    return res.status(r.status).json(data);
+
+    if (!r.ok) {
+      return res.status(r.status).json({ error: data.error?.message || "Erreur Gemini" });
+    }
+
+    // On renvoie le texte dans le même format que l'appli attend
+    const txt = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    return res.status(200).json({ content: [{ type: "text", text: txt }] });
   } catch (e) {
     return res.status(500).json({ error: String(e) });
   }
