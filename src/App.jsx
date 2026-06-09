@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { loadData, saveData } from "./firebase";
 import {
   LayoutDashboard, Calendar, Share2, Settings,
   ChevronRight, ChevronLeft, ChevronDown, ChevronUp,
@@ -2601,6 +2602,43 @@ export default function App() {
     document.head.appendChild(link);
     return ()=>{try{document.head.removeChild(link);}catch(e){}};
   },[]);
+
+  // ── SAUVEGARDE FIREBASE ──
+  const loadedRef = useRef(false);
+  // 1) Au démarrage : on charge les données sauvegardées
+  useEffect(()=>{
+    (async()=>{
+      const data = await loadData();
+      if (data) {
+        if (data.stores) setStores(data.stores);
+        if (data.posts) setPosts(data.posts);
+        if (data.objectives) setObjectives(data.objectives);
+        if (data.storeDetails) setStoreDetails(data.storeDetails);
+        if (data.routine) setRoutine(data.routine);
+        if (data.budgets) setBudgets(data.budgets);
+        if (data.swipes) setSwipes(data.swipes);
+        if (data.audit) setAudit(data.audit);
+        if (data.savedThemes) setSavedThemes(data.savedThemes);
+        if (data.themeId) setThemeId(data.themeId);
+        if (data.fontId) setFontId(data.fontId);
+        if (data.diy) setDiy(data.diy);
+        if (data.customBg !== undefined) setCustomBg(data.customBg);
+        if (data.customCards !== undefined) setCustomCards(data.customCards);
+      }
+      loadedRef.current = true;
+    })();
+  },[]);
+  // 2) À chaque changement : on sauvegarde (après une petite pause)
+  useEffect(()=>{
+    if (!loadedRef.current) return;
+    const id = setTimeout(()=>{
+      saveData({ stores, posts, objectives, storeDetails, routine, budgets,
+        swipes, audit, savedThemes, themeId, fontId, diy,
+        customBg: customBg||null, customCards: customCards||null });
+    }, 800);
+    return ()=>clearTimeout(id);
+  },[stores, posts, objectives, storeDetails, routine, budgets, swipes, audit,
+     savedThemes, themeId, fontId, diy, customBg, customCards]);
 
   const base=THEMES[themeId];
   const diyBg = diy.grad ? `linear-gradient(135deg, ${diy.grad1}, ${diy.grad2})` : diy.bg;
