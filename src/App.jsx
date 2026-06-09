@@ -260,25 +260,9 @@ const NAV = [
 ];
 
 // ── COUP 2 : ROUTINE / BUDGETS / SWIPE FILE ─────────────────
-const INIT_ROUTINE = [
-  {id:1, label:"Ouvrir les mails généraux", done:false},
-  {id:2, label:"Check avis Google/Solocal (6 boutiques)", done:false},
-  {id:3, label:"Messages privés Insta Coriolis St Raph", done:false},
-  {id:4, label:"Stories du jour à programmer", done:false},
-  {id:5, label:"Vérifier le planning de publication", done:false},
-];
-const INIT_BUDGETS = [
-  {id:1, label:"Boost post Save Brignoles", store:"Save Brignoles", total:200, spent:155},
-  {id:2, label:"Campagne Google Ads Coriolis", store:"Coriolis Brignoles", total:300, spent:90},
-  {id:3, label:"Pub Insta Care Le Pontet", store:"Care Le Pontet", total:150, spent:150},
-];
-const INIT_SWIPES = [
-  {id:1, text:"Ne faites JAMAIS ça avec votre batterie... 🔋"},
-  {id:2, text:"On a reçu un téléphone dans un état... 😱"},
-  {id:3, text:"Le saviez-vous ? Votre écran peut être réparé en 30 min ⏱️"},
-  {id:4, text:"POV : ton tel tombe dans l'eau... mais pas de panique 💧"},
-  {id:5, text:"3 astuces pour faire durer ta batterie 2x plus longtemps 🔥"},
-];
+const INIT_ROUTINE = []
+const INIT_BUDGETS = []
+const INIT_SWIPES = []
 
 // Audit : 🟡 À faire / 🔴 En cours / 🟢 Propre
 const AUDIT_STATES = [
@@ -287,14 +271,13 @@ const AUDIT_STATES = [
   {id:"done", emoji:"🟢", label:"Propre",   color:"#059669", bg:"#D1FAE5"},
 ];
 const INIT_AUDIT = [
-  {id:1, name:"Coriolis Brignoles",  gmb:"done", fb:"done", insta:"wip" },
-  {id:2, name:"Coriolis St-Raphaël", gmb:"done", fb:"wip",  insta:"todo"},
-  {id:3, name:"Coriolis Cogolin",    gmb:"wip",  fb:"todo", insta:"todo"},
-  {id:4, name:"Care Le Pontet",      gmb:"done", fb:"done", insta:"done"},
-  {id:5, name:"Care Vitrolles",      gmb:"done", fb:"todo", insta:"done"},
-  {id:6, name:"Save Brignoles",      gmb:"wip",  fb:"done", insta:"wip" },
-  {id:7, name:"Save Hyères",         gmb:"todo", fb:"wip",  insta:"todo"},
-];
+  {id:1, name:"Coriolis Brignoles",  gmb:"todo", fb:"todo", insta:"todo"},
+  {id:2, name:"Coriolis St Raphaël", gmb:"todo", fb:"todo", insta:"todo"},
+  {id:3, name:"Care Le Pontet",      gmb:"todo", fb:"todo", insta:"todo"},
+  {id:4, name:"Care Vitrolles",      gmb:"todo", fb:"todo", insta:"todo"},
+  {id:5, name:"Save Brignoles",      gmb:"todo", fb:"todo", insta:"todo"},
+  {id:6, name:"Save Hyères",         gmb:"todo", fb:"todo", insta:"todo"},
+]
 
 // ── JOURS IMPORTANTS ─────────────────────────────────────────
 const KEY_DATES = [
@@ -314,153 +297,58 @@ const MEDIA_STATUSES = [
 ];
 
 const STORE_CONTACTS = [
-  {manager:"Sophie Martin",   phone:"06 12 34 56 78", email:"brignoles@coriolis.fr",   address:"12 Rue République, 83170 Brignoles",           hours:"Lun-Sam : 9h30-19h00"},
-  {manager:"Lucas Bernard",   phone:"06 23 45 67 89", email:"straph@coriolis.fr",      address:"45 Bd Gal de Gaulle, 83700 St-Raphaël",        hours:"Lun-Sam : 9h30-19h00"},
-  {manager:"Emma Dubois",     phone:"06 34 56 78 90", email:"lepontet@care.fr",        address:"Route Nationale 7, 84130 Le Pontet",            hours:"Lun-Sam : 9h00-19h30"},
-  {manager:"Thomas Petit",    phone:"06 45 67 89 01", email:"vitrolles@care.fr",       address:"Av. Camp de Baigne, 13127 Vitrolles",           hours:"Lun-Sam : 9h30-19h00"},
-  {manager:"Camille Laurent", phone:"06 56 78 90 12", email:"brignoles@save.fr",       address:"8 Bd du 8 Mai 1945, 83170 Brignoles",           hours:"Lun-Sam : 9h30-18h30"},
-  {manager:"Jade Moreau",     phone:"06 67 89 01 23", email:"hyeres@save.fr",          address:"12 Rue des Îlettes, 83400 Hyères",              hours:"Lun-Sam : 9h30-19h00"},
-];
-const STOCK_TEMPLATES = [
-  [{id:1,item:"Flyers promo A5",  qty:150,alert:50, unit:"ex" },{id:2,item:"Stylos logo",    qty:28,alert:20,unit:"pcs"},{id:3,item:"Sacs boutique",   qty:45,alert:25,unit:"pcs"},{id:4,item:"Affiches A2",    qty:8, alert:5, unit:"ex" }],
-  [{id:1,item:"Flyers promo A5",  qty:60, alert:50, unit:"ex" },{id:2,item:"Goodies stylos", qty:40,alert:20,unit:"pcs"},{id:3,item:"Totebags",        qty:55,alert:20,unit:"pcs"},{id:4,item:"Roll-up vitrine",qty:3, alert:2, unit:"ex" }],
-  [{id:1,item:"Flyers A5",        qty:200,alert:50, unit:"ex" },{id:2,item:"Stylos Care",    qty:15,alert:20,unit:"pcs"},{id:3,item:"Sacs brandés",     qty:80,alert:30,unit:"pcs"},{id:4,item:"Kakémono",       qty:2, alert:1, unit:"ex" }],
-  [{id:1,item:"Flyers recto",     qty:30, alert:50, unit:"ex" },{id:2,item:"Stylos",         qty:50,alert:20,unit:"pcs"},{id:3,item:"Sacs Care",       qty:25,alert:25,unit:"pcs"},{id:4,item:"Vitrophanie",    qty:4, alert:2, unit:"ex" }],
-  [{id:1,item:"Flyers réparation",qty:90, alert:40, unit:"ex" },{id:2,item:"Stylos Save",    qty:22,alert:15,unit:"pcs"},{id:3,item:"Sacs écologiques",qty:60,alert:20,unit:"pcs"},{id:4,item:"PLV comptoir",   qty:6, alert:3, unit:"ex" }],
-  [{id:1,item:"Flyers été",       qty:120,alert:40, unit:"ex" },{id:2,item:"Goodies beach",  qty:35,alert:15,unit:"pcs"},{id:3,item:"Sacs Save",       qty:42,alert:20,unit:"pcs"},{id:4,item:"Stickers vitrine",qty:10,alert:4, unit:"ex" }],
-];
-const MEDIA_TEMPLATES = [
-  [{id:1,emoji:"📱",title:"Réparation écran iPhone avant/après",tags:["#AvantApres","#TelephoneBrise"],status:"neuf",   date:"2026-06-05"},
-   {id:2,emoji:"👥",title:"Photo équipe boutique printemps",    tags:["#Equipe"],                     status:"neuf",   date:"2026-06-03"},
-   {id:3,emoji:"🏪",title:"Façade boutique matinée ensoleillée",tags:["#Façade"],                     status:"utilise",date:"2026-05-28"},
-   {id:4,emoji:"🔥",title:"Affiche promo -30% accessoires",     tags:["#Promo"],                      status:"utilise",date:"2026-05-20"},
-   {id:5,emoji:"💔",title:"Samsung écran fissuré — devis rapide",tags:["#TelephoneBrise","#Produit"],  status:"neuf",   date:"2026-06-07"},
-   {id:6,emoji:"✨",title:"Vitrine réaménagée collection été",   tags:["#Façade","#Lifestyle"],        status:"neuf",   date:"2026-06-01"}],
-  [{id:1,emoji:"🌅",title:"Vue depuis la boutique Saint-Raphaël",tags:["#Lifestyle","#Façade"],        status:"neuf",   date:"2026-06-04"},
-   {id:2,emoji:"📦",title:"Unboxing nouveaux smartphones",       tags:["#Produit"],                    status:"utilise",date:"2026-05-30"},
-   {id:3,emoji:"🤝",title:"Partenariat local Saint-Raphaël",     tags:["#Equipe"],                     status:"neuf",   date:"2026-06-06"},
-   {id:4,emoji:"🛠️",title:"Atelier réparation rapide",            tags:["#AvantApres","#Behind"],       status:"neuf",   date:"2026-06-02"}],
-  [{id:1,emoji:"💚",title:"Équipe Care Le Pontet souriante",     tags:["#Equipe"],                     status:"neuf",   date:"2026-06-05"},
-   {id:2,emoji:"🌿",title:"Décoration verte boutique",           tags:["#Façade","#Lifestyle"],        status:"utilise",date:"2026-05-25"},
-   {id:3,emoji:"⭐",title:"5 étoiles Google — client satisfait", tags:["#Promo"],                      status:"neuf",   date:"2026-06-07"},
-   {id:4,emoji:"🔋",title:"Remplacement batterie express",       tags:["#AvantApres","#TelephoneBrise"],status:"neuf",   date:"2026-06-06"},
-   {id:5,emoji:"🎉",title:"Concours cadeaux Care juin",          tags:["#Promo"],                      status:"utilise",date:"2026-06-01"}],
-  [{id:1,emoji:"🌿",title:"Atrium centre commercial Vitrolles",  tags:["#Façade"],                     status:"neuf",   date:"2026-06-03"},
-   {id:2,emoji:"💬",title:"Témoignage client Care Vitrolles",    tags:["#Equipe"],                     status:"neuf",   date:"2026-06-05"},
-   {id:3,emoji:"📲",title:"Transfert de données avant/après",    tags:["#AvantApres","#Produit"],       status:"neuf",   date:"2026-06-04"}],
-  [{id:1,emoji:"🔧",title:"Réparation express écran fissuré",    tags:["#TelephoneBrise","#AvantApres"],status:"utilise",date:"2026-06-02"},
-   {id:2,emoji:"💰",title:"Flyer reprise téléphone -50€",        tags:["#Promo"],                      status:"neuf",   date:"2026-06-05"},
-   {id:3,emoji:"🏪",title:"Devanture boutique Save Brignoles",   tags:["#Façade"],                     status:"neuf",   date:"2026-05-29"},
-   {id:4,emoji:"📸",title:"Samsung Galaxy reconditionné",        tags:["#Produit"],                    status:"neuf",   date:"2026-06-07"}],
-  [{id:1,emoji:"🌴",title:"Shooting été plage accessoires Save", tags:["#Lifestyle","#Produit"],       status:"neuf",   date:"2026-06-06"},
-   {id:2,emoji:"🌊",title:"Ambiance bord de mer Hyères",         tags:["#Façade","#Lifestyle"],        status:"utilise",date:"2026-05-27"},
-   {id:3,emoji:"☀️",title:"Selfie équipe Save journée soleil",   tags:["#Equipe"],                     status:"neuf",   date:"2026-06-04"},
-   {id:4,emoji:"📱",title:"Test waterproof smartphone été",      tags:["#Produit","#Behind"],          status:"neuf",   date:"2026-06-03"}],
-];
+  {manager:"", phone:"", email:"", address:"", hours:""},
+  {manager:"", phone:"", email:"", address:"", hours:""},
+  {manager:"", phone:"", email:"", address:"", hours:""},
+  {manager:"", phone:"", email:"", address:"", hours:""},
+  {manager:"", phone:"", email:"", address:"", hours:""},
+  {manager:"", phone:"", email:"", address:"", hours:""},
+]
+const STOCK_TEMPLATES = [[],[],[],[],[],[]]
+const MEDIA_TEMPLATES = [[],[],[],[],[],[]]
 
 // ─── DONNÉES ────────────────────────────────────────────────
 const INIT_STORES = [
-  {id:1,name:"Coriolis Brignoles", brand:"coriolis",emoji:"🌊",customColor:null,goals:{monthly:24,done:18},weeklyTarget:5,weeklyDone:3},
-  {id:2,name:"Coriolis St Raphaël",brand:"coriolis",emoji:"⛵",customColor:null,goals:{monthly:20,done:12},weeklyTarget:5,weeklyDone:4},
-  {id:3,name:"Care Le Pontet",     brand:"care",    emoji:"💚",customColor:null,goals:{monthly:22,done:19},weeklyTarget:5,weeklyDone:5},
-  {id:4,name:"Care Vitrolles",     brand:"care",    emoji:"🌿",customColor:null,goals:{monthly:18,done:8}, weeklyTarget:5,weeklyDone:2},
-  {id:5,name:"Save Brignoles",     brand:"save",    emoji:"💾",customColor:null,goals:{monthly:20,done:14},weeklyTarget:5,weeklyDone:4},
-  {id:6,name:"Save Hyères",        brand:"save",    emoji:"🌴",customColor:null,goals:{monthly:16,done:9}, weeklyTarget:5,weeklyDone:3},
-];
+  {id:1,name:"Coriolis Brignoles", brand:"coriolis",emoji:"🌊",customColor:null,goals:{monthly:0,done:0},weeklyTarget:0,weeklyDone:0},
+  {id:2,name:"Coriolis St Raphaël",brand:"coriolis",emoji:"⛵",customColor:null,goals:{monthly:0,done:0},weeklyTarget:0,weeklyDone:0},
+  {id:3,name:"Care Le Pontet",     brand:"care",    emoji:"💚",customColor:null,goals:{monthly:0,done:0},weeklyTarget:0,weeklyDone:0},
+  {id:4,name:"Care Vitrolles",     brand:"care",    emoji:"🌿",customColor:null,goals:{monthly:0,done:0},weeklyTarget:0,weeklyDone:0},
+  {id:5,name:"Save Brignoles",     brand:"save",    emoji:"💾",customColor:null,goals:{monthly:0,done:0},weeklyTarget:0,weeklyDone:0},
+  {id:6,name:"Save Hyères",        brand:"save",    emoji:"🌴",customColor:null,goals:{monthly:0,done:0},weeklyTarget:0,weeklyDone:0},
+]
 
-const INIT_POSTS = [
-  {id:1, storeId:1,brand:"coriolis",platform:"ig",status:"publie",   title:"Nouvelle collection printemps 🌸",date:"2026-06-01"},
-  {id:2, storeId:1,brand:"coriolis",platform:"fb",status:"planifie", title:"Promo flash -30% 🔥",            date:"2026-06-10"},
-  {id:3, storeId:1,brand:"coriolis",platform:"tt",status:"pret",     title:"Behind the scenes ✨",           date:"2026-06-08"},
-  {id:4, storeId:1,brand:"coriolis",platform:"sc",status:"redaction",title:"Story produit exclusif 📦",      date:"2026-06-09"},
-  {id:5, storeId:2,brand:"coriolis",platform:"ig",status:"publie",   title:"Lookbook été 2026 ☀️",           date:"2026-06-03"},
-  {id:6, storeId:2,brand:"coriolis",platform:"fb",status:"publie",   title:"Mise à jour horaires été 🕐",    date:"2026-06-05"},
-  {id:7, storeId:2,brand:"coriolis",platform:"tt",status:"idee",     title:"Reel tendance mode ✨",           date:"2026-06-11"},
-  {id:8, storeId:3,brand:"care",    platform:"ig",status:"publie",   title:"Témoignage client ⭐",            date:"2026-06-02"},
-  {id:9, storeId:3,brand:"care",    platform:"fb",status:"publie",   title:"Arrivage produits 📦",            date:"2026-06-04"},
-  {id:10,storeId:3,brand:"care",    platform:"tt",status:"planifie", title:"Conseil du pro 💡",              date:"2026-06-12"},
-  {id:11,storeId:3,brand:"care",    platform:"ig",status:"publie",   title:"Concours juin 🎉",               date:"2026-06-06"},
-  {id:12,storeId:3,brand:"care",    platform:"sc",status:"publie",   title:"Story flash quotidienne 💬",     date:"2026-06-07"},
-  {id:13,storeId:4,brand:"care",    platform:"ig",status:"idee",     title:"Shooting produits Care 📸",      date:"2026-06-13"},
-  {id:14,storeId:4,brand:"care",    platform:"fb",status:"redaction",title:"Événement local Vitrolles 📍",   date:"2026-06-14"},
-  {id:15,storeId:5,brand:"save",    platform:"ig",status:"pret",     title:"Tutoriel réparation 🔧",         date:"2026-06-05"},
-  {id:16,storeId:5,brand:"save",    platform:"tt",status:"publie",   title:"Avant/après réparation 📱",      date:"2026-06-03"},
-  {id:17,storeId:5,brand:"save",    platform:"fb",status:"planifie", title:"Offre reprise téléphone 💰",     date:"2026-06-09"},
-  {id:18,storeId:6,brand:"save",    platform:"ig",status:"idee",     title:"Reel Save Hyères summer 🌴",     date:"2026-06-10"},
-  {id:19,storeId:6,brand:"save",    platform:"fb",status:"redaction",title:"Promo accessoires été ☀️",       date:"2026-06-08"},
-  {id:20,storeId:6,brand:"save",    platform:"sc",status:"planifie", title:"Story flash promo 👻",           date:"2026-06-11"},
-];
+const INIT_POSTS = []
 
-const INIT_OBJ = [
-  {id:1,title:"5 posts/semaine sur toutes les boutiques",emoji:"📱",progress:60,done:false,weekly:[
-    {id:11,title:"Sem. 1 – Batch content Coriolis",done:true,daily:[
-      {id:111,title:"Lundi : Photos produits Coriolis Brignoles",done:true},
-      {id:112,title:"Jeudi : Stories Save Brignoles",done:true}]},
-    {id:12,title:"Sem. 2 – Batch content Care + Save",done:false,daily:[
-      {id:121,title:"Mardi : Shooting Care Le Pontet",done:false},
-      {id:122,title:"Vendredi : Réels TikTok Care",done:false}]},
-  ]},
-  {id:2,title:"Google Business Profile à jour (6 boutiques)",emoji:"📍",progress:40,done:false,weekly:[
-    {id:21,title:"Mise à jour horaires d'été toutes boutiques",done:true,daily:[]},
-    {id:22,title:"Ajouter 5 nouvelles photos par boutique",done:false,daily:[]},
-  ]},
-  {id:3,title:"1 vidéo TikTok virale par enseigne",emoji:"🎵",progress:33,done:false,weekly:[
-    {id:31,title:"Script + tournage TikTok Coriolis",done:true,daily:[]},
-    {id:32,title:"Script + tournage TikTok Care",done:false,daily:[]},
-    {id:33,title:"Script + tournage TikTok Save",done:false,daily:[]},
-  ]},
-  {id:4,title:"Newsletter mensuelle pour toutes les enseignes",emoji:"📧",progress:80,done:false,weekly:[
-    {id:41,title:"Rédaction et brief du contenu",done:true,daily:[]},
-    {id:42,title:"Design HTML de l'email",done:true,daily:[]},
-    {id:43,title:"Test + envoi final + rapport",done:false,daily:[]},
-  ]},
-];
+const INIT_OBJ = []
 
 // ─── DONNÉES HUBS DÉDIÉS ────────────────────────────────────
 function mkStoreDetails(stores) {
-  const projTpl = [
-    "Focus sur la nouvelle collection printemps 🌸. Objectif : booster la visibilité locale et générer du trafic en boutique. Priorité TikTok + Stories quotidiennes.",
-    "Campagne offre reprise téléphone pour St Raphaël. Mettre en avant les accessoires été ☀️. Tester les Reels Instagram cette semaine.",
-    "Highlight le service de réparation rapide. Organiser un mini-concours Instagram. Récupérer 5 nouveaux avis Google avant fin du mois.",
-    "Focus témoignages clients et avis Google. Préparer contenu de rentrée. Attention : doublon de post à éviter avec Care Le Pontet.",
-    "Mettre en avant la reprise téléphone. Créer du contenu éducatif : 'Pourquoi faire réparer plutôt qu'acheter neuf ?' Très bon sujet TikTok.",
-    "Contenu été 🌴 : produits beach, accessoires, lifestyle. TikTok tendance + Stories quotidiennes. Shooter en extérieur si météo OK.",
-  ];
-  const captionsTpl = [
-    ["Lundi",    "ig", "Nouvelle arrivée en boutique ! 🌟\n\n✨ Découvrez notre sélection du moment, conçue pour s'adapter à votre lifestyle.\n\n📍 En boutique dès maintenant !\n\n#Boutique #Nouveauté #Tech"],
-    ["Mardi",    "tt", "POV : tu passes devant notre vitrine et tu craques 😍\n\nNouveau stock disponible ! Venez vite avant qu'il ne soit trop tard 🏃\n\n#TikTokShop #Tendance #Shopping"],
-    ["Mercredi", "fb", "⭐ Merci à notre client pour ce super témoignage !\n\nVotre satisfaction est notre priorité. On est là pour vous 🙌\n\n📞 Prenez rendez-vous directement en boutique."],
-    ["Jeudi",    "ig", "🔥 PROMO FLASH jusqu'à ce soir minuit !\n\n-20% sur une sélection de produits. Profitez-en, ça ne dure pas !\n\n👇 Plus d'infos en story\n\n#Promo #BonPlan #Flash"],
-    ["Vendredi", "sc", "On vous attend ce week-end ! 😊\n\nHoraires : 9h30 - 19h00 🕐\n\nÀ très vite ! 👋"],
-  ];
   const d = {};
+  const DAYS = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi"];
   stores.forEach((store, idx) => {
     d[store.id] = {
-      socialLinks:  {fb:"", ig:"", tt:"", sc:"", gb:"", sl:"", pt:"", mc:"", pj:"", web:"",
-        ...(store.brand==="save"
-          ? {pt:"https://app.partoo.co/"}
-          : {sl:"https://partner.solocal.com/"})},
+      socialLinks:  {fb:"", ig:"", tt:"", sc:"", gb:"", sl:"", pt:"", mc:"", pj:"", web:""},
       credentials:  "",
       showCreds:    false,
-      projections:  projTpl[idx] || projTpl[0],
+      projections:  "",
       gridItems:    Array.from({length:9}, (_, i) => ({
         id:i+1,
-        hasContent: i < 4,
-        title: ["Collection printemps","Story produit","Reel TikTok","Promo flash","","","","",""][i] || "",
+        hasContent: false,
+        title: "",
         platform: "ig",
         color: BRANDS[store.brand].primary,
-        status: ["publie","publie","planifie","pret","idee","","","",""][i] || "idee",
+        status: "idee",
       })),
-      weeklyPosts: captionsTpl.map((ct, i) => ({
-        id: i+1, day:ct[0], platform:ct[1],
-        title: ["Post produit","TikTok tendance","Témoignage client","Promo flash","Story week-end"][i],
-        caption: ct[2],
-        done: i < 2,
+      weeklyPosts: DAYS.map((day, i) => ({
+        id: i+1, day, platform:"ig",
+        title: "",
+        caption: "",
+        done: false,
       })),
-      mediaItems: (MEDIA_TEMPLATES[idx] || MEDIA_TEMPLATES[0]).map(m=>({...m})),
-      nextMediaId: (MEDIA_TEMPLATES[idx] || MEDIA_TEMPLATES[0]).length + 1,
+      mediaItems: [],
+      nextMediaId: 1,
       contacts: {...(STORE_CONTACTS[idx] || STORE_CONTACTS[0])},
-      adStock: (STOCK_TEMPLATES[idx] || STOCK_TEMPLATES[0]).map(s=>({...s})),
+      adStock: [],
     };
   });
   return d;
@@ -1961,7 +1849,7 @@ function InfoTab({det, upd, color, t, font, isMobile}) {
             );
           })}
           <button onClick={()=>{
-            const newId=Math.max(...det.adStock.map(s=>s.id))+1;
+            const newId=(det.adStock.length?Math.max(...det.adStock.map(s=>s.id)):0)+1;
             upd({adStock:[...det.adStock,{id:newId,item:"Nouveau support",qty:0,alert:10,unit:"pcs"}]});
           }} style={{background:t.hover,color:t.sub,borderRadius:r,padding:"9px",border:`1.5px dashed ${t.border}`,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",justifyContent:"center",gap:5}}>
             <Plus size={13}/> Ajouter un support
@@ -2409,6 +2297,7 @@ function ToolsView({t, font, isMobile, stores, routine, setRoutine, budgets, set
   const p = isMobile?14:24;
   const r = 14;
   const [newSwipe, setNewSwipe] = useState("");
+  const [newTask, setNewTask] = useState("");
   const [copiedId, setCopiedId] = useState(null);
   const [addBudget, setAddBudget] = useState(false);
   const [nb, setNb] = useState({label:"",store:stores[0]?.name||"",total:100,spent:0});
@@ -2454,18 +2343,35 @@ function ToolsView({t, font, isMobile, stores, routine, setRoutine, budgets, set
             </span>
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {routine.length===0 && (
+              <p style={{color:t.muted,fontSize:12,textAlign:"center",padding:"10px 0"}}>Aucune tâche. Ajoute ta première ci-dessous 👇</p>
+            )}
             {routine.map(item=>(
-              <button key={item.id} onClick={()=>setRoutine(prev=>prev.map(x=>x.id===item.id?{...x,done:!x.done}:x))}
-                style={{background:item.done?t.accentBg:t.hover,border:`1px solid ${item.done?t.accent+"55":t.border}`,borderRadius:r,padding:"11px 14px",display:"flex",alignItems:"center",gap:10,cursor:"pointer",textAlign:"left",width:"100%"}}>
-                {item.done?<CheckCircle size={18} style={{color:t.accent,flexShrink:0}}/>:<Circle size={18} style={{color:t.muted,flexShrink:0}}/>}
-                <span style={{color:item.done?t.muted:t.text,fontSize:13,fontWeight:500,textDecoration:item.done?"line-through":"none"}}>{item.label}</span>
-              </button>
+              <div key={item.id} style={{display:"flex",alignItems:"center",gap:6}}>
+                <button onClick={()=>setRoutine(prev=>prev.map(x=>x.id===item.id?{...x,done:!x.done}:x))}
+                  style={{flex:1,background:item.done?t.accentBg:t.hover,border:`1px solid ${item.done?t.accent+"55":t.border}`,borderRadius:r,padding:"11px 14px",display:"flex",alignItems:"center",gap:10,cursor:"pointer",textAlign:"left"}}>
+                  {item.done?<CheckCircle size={18} style={{color:t.accent,flexShrink:0}}/>:<Circle size={18} style={{color:t.muted,flexShrink:0}}/>}
+                  <span style={{color:item.done?t.muted:t.text,fontSize:13,fontWeight:500,textDecoration:item.done?"line-through":"none"}}>{item.label}</span>
+                </button>
+                <button onClick={()=>setRoutine(prev=>prev.filter(x=>x.id!==item.id))}
+                  style={{background:"transparent",color:t.muted,border:"none",cursor:"pointer",padding:4,flexShrink:0}}><Trash2 size={14}/></button>
+              </div>
             ))}
           </div>
-          <button onClick={()=>setRoutine(prev=>prev.map(x=>({...x,done:false})))}
-            style={{marginTop:12,width:"100%",background:t.hover,color:t.sub,borderRadius:r,padding:"9px",border:"none",cursor:"pointer",fontSize:12,fontWeight:600}}>
-            ↺ Réinitialiser pour demain
-          </button>
+          <div style={{display:"flex",gap:8,marginTop:10}}>
+            <input value={newTask} onChange={e=>setNewTask(e.target.value)}
+              onKeyDown={e=>{if(e.key==="Enter"&&newTask.trim()){setRoutine(prev=>[...prev,{id:Date.now(),label:newTask.trim(),done:false}]);setNewTask("");}}}
+              placeholder="Ajouter une tâche du matin..."
+              style={{background:t.inputBg||t.hover,color:t.text,border:`1px solid ${t.border}`,borderRadius:r,flex:1,fontSize:13,padding:"9px 12px",outline:"none",fontFamily:font.body}}/>
+            <button onClick={()=>{if(newTask.trim()){setRoutine(prev=>[...prev,{id:Date.now(),label:newTask.trim(),done:false}]);setNewTask("");}}}
+              style={{background:t.accent,color:"#fff",borderRadius:r,padding:"9px 13px",border:"none",cursor:"pointer"}}><Plus size={15}/></button>
+          </div>
+          {routine.length>0 && (
+            <button onClick={()=>setRoutine(prev=>prev.map(x=>({...x,done:false})))}
+              style={{marginTop:10,width:"100%",background:t.hover,color:t.sub,borderRadius:r,padding:"9px",border:"none",cursor:"pointer",fontSize:12,fontWeight:600}}>
+              ↺ Réinitialiser pour demain
+            </button>
+          )}
         </div>
 
         {/* BUDGETS PUB */}
