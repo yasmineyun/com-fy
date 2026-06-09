@@ -35,17 +35,32 @@ npm run preview    # prévisualise le build
 
 ---
 
-## 🤖 Activer le Générateur de Légendes IA
+## 🤖 Générateur de Légendes IA (Gemini gratuit)
 
-Le navigateur **ne peut pas** appeler l'API Anthropic directement (la clé doit rester secrète).
+Le navigateur **ne peut pas** appeler l'API directement (la clé doit rester secrète).
 Une fonction serverless sert de proxy : `api/generate.js` (déjà incluse, prête pour Vercel).
 
-1. Récupère une clé sur https://console.anthropic.com
-2. Ajoute-la en **variable d'environnement** (jamais dans le code) :
-   - Vercel : Settings → Environment Variables → `ANTHROPIC_API_KEY`
+1. Récupère une clé gratuite sur https://aistudio.google.com (Get API key)
+2. Ajoute-la en **variable d'environnement** sur Vercel :
+   - Settings → Environment Variables → Key : `GEMINI_API_KEY` (MAJUSCULES) → Value : ta clé `AIza...`
+   - Coche **Production**, puis **Redeploy**
 3. C'est tout. Le front appelle `/api/generate` automatiquement.
 
 > Sans clé configurée, toute l'appli fonctionne ; seul le bouton IA affiche un message.
+
+## 💾 Sauvegarde des données (Firebase Firestore)
+
+Les données sont sauvegardées automatiquement dans Firebase (fichier `src/firebase.js`).
+Sur la console Firebase (projet com-fy) : active **Firestore Database** puis mets les règles :
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} { allow read, write: if true; }
+  }
+}
+```
+> ⚠️ Règles ouvertes = OK pour un outil privé, mais n'y stocke pas de vrais mots de passe.
 
 ---
 
