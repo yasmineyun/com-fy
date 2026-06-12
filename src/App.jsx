@@ -1,5 +1,30 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { loadData, saveData } from "./firebase";
+// ── FIREBASE FIRESTORE (sauvegarde multi-appareils) ──────────────────────
+// Utilise Cloud Firestore via REST — zéro package npm, zéro erreur de build.
+// Config publique Firebase (pas un secret, normal pour les apps web).
+const FS_KEY = "AIzaSyC95Tzj2kgpmpy7zM9LhIH7Ybh0x9aN4wo";
+const FS_URL = `https://firestore.googleapis.com/v1/projects/com-fy/databases/(default)/documents/comfy/data`;
+
+async function loadData() {
+  try {
+    const r = await fetch(`${FS_URL}?key=${FS_KEY}`);
+    if (!r.ok) return null;
+    const doc = await r.json();
+    const str = doc.fields?.appState?.stringValue;
+    return str ? JSON.parse(str) : null;
+  } catch { return null; }
+}
+async function saveData(data) {
+  try {
+    const str = JSON.stringify(data);
+    await fetch(`${FS_URL}?key=${FS_KEY}&updateMask.fieldPaths=appState`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fields: { appState: { stringValue: str } } }),
+    });
+  } catch(e) { console.error("saveData:", e); }
+}
+// ─────────────────────────────────────────────────────────────────────────
 import {
   LayoutDashboard, Calendar, Share2, Settings,
   ChevronRight, ChevronLeft, ChevronDown, ChevronUp,
@@ -2051,10 +2076,10 @@ function CalendarView({t, font, objectives, setObjectives, isMobile}) {
         </div>
       )}
       {isMobile?(
-        <>{showCal?<CalBlock/>:<ObjList/>}</>
+        <>{showCal?CalBlock():ObjList()}</>
       ):(
         <div style={{display:"grid",gridTemplateColumns:"2fr 3fr",gap:20}}>
-          <CalBlock/><ObjList/>
+          {CalBlock()}{ObjList()}
         </div>
       )}
     </div>
