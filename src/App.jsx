@@ -1897,6 +1897,15 @@ function CalendarView({t, font, objectives, setObjectives, isMobile}) {
   const [newTitle,setNewTitle]=useState("");
   const [newEmoji,setNewEmoji]=useState("🎯");
   const [showCal,setShowCal]=useState(true);
+  // édition inline
+  const [editId,setEditId]=useState(null);
+  const [editTitle,setEditTitle]=useState("");
+  const [editEmoji,setEditEmoji]=useState("🎯");
+  // ajout hebdo / quotidien
+  const [addingW,setAddingW]=useState(null); // id objectif mensuel
+  const [newWTitle,setNewWTitle]=useState("");
+  const [addingD,setAddingD]=useState(null); // "mid-wid"
+  const [newDTitle,setNewDTitle]=useState("");
 
   const yr=cur.getFullYear(),mo=cur.getMonth();
   const MONTHS=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
@@ -1904,11 +1913,40 @@ function CalendarView({t, font, objectives, setObjectives, isMobile}) {
   const first=(new Date(yr,mo,1).getDay()+6)%7;
   const total=new Date(yr,mo+1,0).getDate();
   const cells=[...Array(first).fill(null),...Array.from({length:total},(_,i)=>i+1)];
+  const EMOJIS=["🎯","📱","📍","🎵","📧","💡","🏆","⭐","🔥","🌟"];
 
+  // ── CRUD mensuel ──
   const toggleM=id=>setObjectives(p=>p.map(o=>o.id===id?{...o,done:!o.done}:o));
+  const deleteM=id=>setObjectives(p=>p.filter(o=>o.id!==id));
+  const addObj=()=>{
+    if(!newTitle.trim())return;
+    setObjectives(p=>[...p,{id:Date.now(),title:newTitle,emoji:newEmoji,progress:0,done:false,weekly:[]}]);
+    setNewTitle("");setAdding(false);
+  };
+  const saveEdit=id=>{
+    if(!editTitle.trim())return;
+    setObjectives(p=>p.map(o=>o.id===id?{...o,title:editTitle,emoji:editEmoji}:o));
+    setEditId(null);
+  };
+  const setProgress=(id,delta)=>setObjectives(p=>p.map(o=>o.id===id?{...o,progress:Math.min(100,Math.max(0,o.progress+delta))}:o));
+
+  // ── CRUD hebdomadaire ──
   const toggleW=(mid,wid)=>setObjectives(p=>p.map(o=>o.id===mid?{...o,weekly:o.weekly.map(w=>w.id===wid?{...w,done:!w.done}:w)}:o));
+  const deleteW=(mid,wid)=>setObjectives(p=>p.map(o=>o.id===mid?{...o,weekly:o.weekly.filter(w=>w.id!==wid)}:o));
+  const addW=(mid)=>{
+    if(!newWTitle.trim())return;
+    setObjectives(p=>p.map(o=>o.id===mid?{...o,weekly:[...o.weekly,{id:Date.now(),title:newWTitle,done:false,daily:[]}]}:o));
+    setNewWTitle("");setAddingW(null);
+  };
+
+  // ── CRUD quotidien ──
   const toggleD=(mid,wid,did)=>setObjectives(p=>p.map(o=>o.id===mid?{...o,weekly:o.weekly.map(w=>w.id===wid?{...w,daily:w.daily.map(d=>d.id===did?{...d,done:!d.done}:d)}:w)}:o));
-  const addObj=()=>{if(!newTitle.trim())return;setObjectives(p=>[...p,{id:Date.now(),title:newTitle,emoji:newEmoji,progress:0,done:false,weekly:[]}]);setNewTitle("");setAdding(false);};
+  const deleteD=(mid,wid,did)=>setObjectives(p=>p.map(o=>o.id===mid?{...o,weekly:o.weekly.map(w=>w.id===wid?{...w,daily:w.daily.filter(d=>d.id!==did)}:w)}:o));
+  const addD=(mid,wid)=>{
+    if(!newDTitle.trim())return;
+    setObjectives(p=>p.map(o=>o.id===mid?{...o,weekly:o.weekly.map(w=>w.id===wid?{...w,daily:[...w.daily,{id:Date.now(),title:newDTitle,done:false}]}:w)}:o));
+    setNewDTitle("");setAddingD(null);
+  };
 
   const p=isMobile?14:24;
 
@@ -1967,9 +2005,10 @@ function CalendarView({t, font, objectives, setObjectives, isMobile}) {
           <Plus size={13}/> Ajouter
         </button>
       </div>
+
+      {/* Formulaire ajout mensuel */}
       {adding&&(
-        <div style={{background:t.card,border:`2px solid ${t.accent}`,borderRadius:16,padding:14,
-          display:"flex",flexDirection:"column",gap:8}}>
+        <div style={{background:t.card,border:`2px solid ${t.accent}`,borderRadius:16,padding:14,display:"flex",flexDirection:"column",gap:8}}>
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
             <span style={{fontSize:20}}>{newEmoji}</span>
             <input value={newTitle} onChange={e=>setNewTitle(e.target.value)}
@@ -1979,7 +2018,7 @@ function CalendarView({t, font, objectives, setObjectives, isMobile}) {
                 outline:"none",borderRadius:10,flex:1,fontSize:13,padding:"8px 12px",fontFamily:font.body}}/>
           </div>
           <div style={{display:"flex",gap:3,flexWrap:"wrap"}}>
-            {["🎯","📱","📍","🎵","📧","💡","🏆","⭐","🔥","🌟"].map(e=>(
+            {EMOJIS.map(e=>(
               <button key={e} onClick={()=>setNewEmoji(e)}
                 style={{fontSize:17,background:newEmoji===e?t.accentBg:"transparent",
                   borderRadius:7,padding:"2px 3px",cursor:"pointer",
@@ -1997,61 +2036,184 @@ function CalendarView({t, font, objectives, setObjectives, isMobile}) {
           </div>
         </div>
       )}
+
+      {objectives.length===0&&!adding&&(
+        <p style={{color:t.muted,fontSize:12,textAlign:"center",padding:"20px 0"}}>Aucun objectif. Clique sur + Ajouter pour commencer 🎯</p>
+      )}
+
       {objectives.map(obj=>{
         const wDone=obj.weekly.filter(w=>w.done).length;
         const isExp=expandM===obj.id;
+        const isEditing=editId===obj.id;
         return (
           <div key={obj.id} style={{background:t.card,border:`1px solid ${t.border}`,borderRadius:16,overflow:"hidden",boxShadow:t.shadow}}>
-            <div onClick={()=>setExpandM(isExp?null:obj.id)}
-              style={{display:"flex",alignItems:"center",gap:10,padding:isMobile?12:14,cursor:"pointer"}}>
-              <button onClick={e=>{e.stopPropagation();toggleM(obj.id);}}
-                style={{color:obj.done?"#10B981":t.muted,flexShrink:0,background:"transparent",border:"none",cursor:"pointer"}}>
-                {obj.done?<CheckCircle size={18}/>:<Circle size={18}/>}
-              </button>
-              <span style={{fontSize:18,flexShrink:0}}>{obj.emoji}</span>
-              <div style={{flex:1,minWidth:0}}>
-                <p style={{color:obj.done?t.muted:t.text,fontWeight:600,fontSize:12,
-                  textDecoration:obj.done?"line-through":"none",
-                  overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{obj.title}</p>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginTop:5}}>
-                  <Bar val={obj.progress} max={100} color={t.accent} h={4}/>
-                  <span style={{color:t.muted,fontSize:10,whiteSpace:"nowrap"}}>{obj.progress}%</span>
+
+            {/* Mode édition */}
+            {isEditing?(
+              <div style={{padding:14,display:"flex",flexDirection:"column",gap:8}}>
+                <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                  <span style={{fontSize:20}}>{editEmoji}</span>
+                  <input value={editTitle} onChange={e=>setEditTitle(e.target.value)}
+                    onKeyDown={e=>e.key==="Enter"&&saveEdit(obj.id)}
+                    style={{background:t.inputBg||t.hover,color:t.text,border:`1px solid ${t.accent}`,
+                      outline:"none",borderRadius:10,flex:1,fontSize:13,padding:"8px 12px",fontFamily:font.body}}/>
                 </div>
-              </div>
-              <span style={{color:t.muted,fontSize:10,whiteSpace:"nowrap",flexShrink:0}}>{wDone}/{obj.weekly.length}</span>
-              {isExp?<ChevronUp size={13} style={{color:t.muted,flexShrink:0}}/>:<ChevronDown size={13} style={{color:t.muted,flexShrink:0}}/>}
-            </div>
-            {isExp&&obj.weekly.map(w=>{
-              const isWExp=expandW[w.id];
-              return (
-                <div key={w.id} style={{borderTop:`1px solid ${t.border}`}}>
-                  <div onClick={()=>setExpandW(p=>({...p,[w.id]:!isWExp}))}
-                    style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",
-                      background:t.cardInner||t.hover,cursor:"pointer"}}>
-                    <div style={{width:18}}/>
-                    <button onClick={e=>{e.stopPropagation();toggleW(obj.id,w.id);}}
-                      style={{color:w.done?"#10B981":t.muted,background:"transparent",border:"none",cursor:"pointer"}}>
-                      {w.done?<CheckCircle size={15}/>:<Circle size={15}/>}
-                    </button>
-                    <p style={{color:w.done?t.muted:t.text,fontSize:12,flex:1,textDecoration:w.done?"line-through":"none"}}>
-                      📆 {w.title}
-                    </p>
-                    {w.daily.length>0&&(isWExp?<ChevronUp size={12} style={{color:t.muted}}/>:<ChevronDown size={12} style={{color:t.muted}}/>)}
-                  </div>
-                  {isWExp&&w.daily.map(d=>(
-                    <div key={d.id} style={{borderTop:`1px solid ${t.border}`,background:t.card,
-                      display:"flex",alignItems:"center",gap:10,padding:"7px 12px"}}>
-                      <div style={{width:34}}/>
-                      <button onClick={()=>toggleD(obj.id,w.id,d.id)}
-                        style={{color:d.done?"#10B981":t.muted,background:"transparent",border:"none",cursor:"pointer"}}>
-                        {d.done?<CheckCircle size={13}/>:<Circle size={13}/>}
-                      </button>
-                      <p style={{color:d.done?t.muted:t.text,fontSize:11,textDecoration:d.done?"line-through":"none"}}>{d.title}</p>
-                    </div>
+                <div style={{display:"flex",gap:3,flexWrap:"wrap"}}>
+                  {EMOJIS.map(e=>(
+                    <button key={e} onClick={()=>setEditEmoji(e)}
+                      style={{fontSize:17,background:editEmoji===e?t.accentBg:"transparent",
+                        borderRadius:7,padding:"2px 3px",cursor:"pointer",
+                        border:`1px solid ${editEmoji===e?t.accent:"transparent"}`}}>{e}</button>
                   ))}
                 </div>
-              );
-            })}
+                <div style={{display:"flex",gap:8}}>
+                  <button onClick={()=>saveEdit(obj.id)}
+                    style={{background:t.accent,color:"#fff",borderRadius:9,padding:"7px 14px",fontSize:12,fontWeight:700,border:"none",cursor:"pointer"}}>
+                    <Check size={13}/>
+                  </button>
+                  <button onClick={()=>setEditId(null)}
+                    style={{background:t.hover,color:t.sub,borderRadius:9,padding:"7px 10px",border:"none",cursor:"pointer"}}>
+                    <X size={13}/>
+                  </button>
+                </div>
+              </div>
+            ):(
+              <>
+                {/* Header objectif */}
+                <div style={{display:"flex",alignItems:"center",gap:8,padding:isMobile?"10px 12px":"12px 14px"}}>
+                  <button onClick={e=>{e.stopPropagation();toggleM(obj.id);}}
+                    style={{color:obj.done?"#10B981":t.muted,flexShrink:0,background:"transparent",border:"none",cursor:"pointer"}}>
+                    {obj.done?<CheckCircle size={18}/>:<Circle size={18}/>}
+                  </button>
+                  <span style={{fontSize:18,flexShrink:0}}>{obj.emoji}</span>
+                  <div style={{flex:1,minWidth:0,cursor:"pointer"}} onClick={()=>setExpandM(isExp?null:obj.id)}>
+                    <p style={{color:obj.done?t.muted:t.text,fontWeight:600,fontSize:12,
+                      textDecoration:obj.done?"line-through":"none",
+                      overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{obj.title}</p>
+                    <div style={{display:"flex",alignItems:"center",gap:8,marginTop:4}}>
+                      <Bar val={obj.progress} max={100} color={t.accent} h={4}/>
+                      <span style={{color:t.muted,fontSize:10,whiteSpace:"nowrap",minWidth:26}}>{obj.progress}%</span>
+                    </div>
+                  </div>
+                  {/* Boutons % */}
+                  <button onClick={e=>{e.stopPropagation();setProgress(obj.id,-10);}}
+                    style={{background:t.hover,color:t.sub,border:"none",borderRadius:7,padding:"3px 7px",fontSize:11,fontWeight:700,cursor:"pointer",flexShrink:0}}>−10</button>
+                  <button onClick={e=>{e.stopPropagation();setProgress(obj.id,10);}}
+                    style={{background:t.accentBg,color:t.accent,border:"none",borderRadius:7,padding:"3px 7px",fontSize:11,fontWeight:700,cursor:"pointer",flexShrink:0}}>+10</button>
+                  {/* Éditer */}
+                  <button onClick={e=>{e.stopPropagation();setEditId(obj.id);setEditTitle(obj.title);setEditEmoji(obj.emoji);}}
+                    style={{background:"transparent",color:t.muted,border:"none",cursor:"pointer",padding:3,flexShrink:0}}>
+                    <Edit3 size={13}/>
+                  </button>
+                  {/* Supprimer */}
+                  <button onClick={e=>{e.stopPropagation();deleteM(obj.id);}}
+                    style={{background:"transparent",color:"#EF4444",border:"none",cursor:"pointer",padding:3,flexShrink:0}}>
+                    <Trash2 size={13}/>
+                  </button>
+                  <span style={{color:t.muted,fontSize:10,whiteSpace:"nowrap",flexShrink:0}}>{wDone}/{obj.weekly.length}</span>
+                  <div onClick={()=>setExpandM(isExp?null:obj.id)} style={{cursor:"pointer",flexShrink:0}}>
+                    {isExp?<ChevronUp size={13} style={{color:t.muted}}/>:<ChevronDown size={13} style={{color:t.muted}}/>}
+                  </div>
+                </div>
+
+                {/* Sous-objectifs hebdomadaires */}
+                {isExp&&(
+                  <>
+                    {obj.weekly.map(w=>{
+                      const isWExp=expandW[w.id];
+                      const dKey=`${obj.id}-${w.id}`;
+                      return (
+                        <div key={w.id} style={{borderTop:`1px solid ${t.border}`}}>
+                          <div style={{display:"flex",alignItems:"center",gap:8,padding:"9px 12px",background:t.cardInner||t.hover}}>
+                            <div style={{width:14}}/>
+                            <button onClick={e=>{e.stopPropagation();toggleW(obj.id,w.id);}}
+                              style={{color:w.done?"#10B981":t.muted,background:"transparent",border:"none",cursor:"pointer",flexShrink:0}}>
+                              {w.done?<CheckCircle size={15}/>:<Circle size={15}/>}
+                            </button>
+                            <p onClick={()=>setExpandW(prev=>({...prev,[w.id]:!isWExp}))}
+                              style={{color:w.done?t.muted:t.text,fontSize:12,flex:1,textDecoration:w.done?"line-through":"none",cursor:"pointer"}}>
+                              📆 {w.title}
+                            </p>
+                            <button onClick={()=>setExpandW(prev=>({...prev,[w.id]:!isWExp}))}
+                              style={{background:"transparent",color:t.muted,border:"none",cursor:"pointer",padding:2,flexShrink:0}}>
+                              {isWExp?<ChevronUp size={12}/>:<ChevronDown size={12}/>}
+                            </button>
+                            <button onClick={()=>deleteW(obj.id,w.id)}
+                              style={{background:"transparent",color:"#EF4444",border:"none",cursor:"pointer",padding:2,flexShrink:0}}>
+                              <Trash2 size={12}/>
+                            </button>
+                          </div>
+                          {isWExp&&(
+                            <>
+                              {w.daily.map(d=>(
+                                <div key={d.id} style={{borderTop:`1px solid ${t.border}`,background:t.card,
+                                  display:"flex",alignItems:"center",gap:8,padding:"7px 12px"}}>
+                                  <div style={{width:28}}/>
+                                  <button onClick={()=>toggleD(obj.id,w.id,d.id)}
+                                    style={{color:d.done?"#10B981":t.muted,background:"transparent",border:"none",cursor:"pointer",flexShrink:0}}>
+                                    {d.done?<CheckCircle size={13}/>:<Circle size={13}/>}
+                                  </button>
+                                  <p style={{color:d.done?t.muted:t.text,fontSize:11,flex:1,textDecoration:d.done?"line-through":"none"}}>{d.title}</p>
+                                  <button onClick={()=>deleteD(obj.id,w.id,d.id)}
+                                    style={{background:"transparent",color:"#EF4444",border:"none",cursor:"pointer",padding:2,flexShrink:0}}>
+                                    <Trash2 size={11}/>
+                                  </button>
+                                </div>
+                              ))}
+                              {/* Ajout tâche quotidienne */}
+                              {addingD===dKey?(
+                                <div style={{borderTop:`1px solid ${t.border}`,background:t.card,display:"flex",gap:6,padding:"7px 12px",alignItems:"center"}}>
+                                  <div style={{width:28}}/>
+                                  <input value={newDTitle} onChange={e=>setNewDTitle(e.target.value)}
+                                    onKeyDown={e=>e.key==="Enter"&&addD(obj.id,w.id)}
+                                    placeholder="Tâche quotidienne..."
+                                    style={{background:t.inputBg||t.hover,color:t.text,border:`1px solid ${t.border}`,
+                                      outline:"none",borderRadius:8,flex:1,fontSize:11,padding:"5px 9px",fontFamily:font.body}}/>
+                                  <button onClick={()=>addD(obj.id,w.id)}
+                                    style={{background:t.accent,color:"#fff",border:"none",borderRadius:7,padding:"5px 8px",fontSize:11,cursor:"pointer"}}>+</button>
+                                  <button onClick={()=>setAddingD(null)}
+                                    style={{background:"transparent",color:t.muted,border:"none",cursor:"pointer"}}><X size={11}/></button>
+                                </div>
+                              ):(
+                                <div style={{borderTop:`1px solid ${t.border}`,background:t.card,padding:"5px 12px"}}>
+                                  <button onClick={()=>{setAddingD(dKey);setNewDTitle("");}}
+                                    style={{background:"transparent",color:t.muted,border:"none",cursor:"pointer",fontSize:11,display:"flex",alignItems:"center",gap:4,paddingLeft:36}}>
+                                    <Plus size={11}/> Ajouter une tâche
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    {/* Ajout sous-objectif hebdo */}
+                    {addingW===obj.id?(
+                      <div style={{borderTop:`1px solid ${t.border}`,background:t.hover,display:"flex",gap:6,padding:"8px 12px",alignItems:"center"}}>
+                        <div style={{width:14}}/>
+                        <input value={newWTitle} onChange={e=>setNewWTitle(e.target.value)}
+                          onKeyDown={e=>e.key==="Enter"&&addW(obj.id)}
+                          placeholder="Objectif de la semaine..."
+                          style={{background:t.inputBg||t.card,color:t.text,border:`1px solid ${t.border}`,
+                            outline:"none",borderRadius:8,flex:1,fontSize:12,padding:"6px 10px",fontFamily:font.body}}/>
+                        <button onClick={()=>addW(obj.id)}
+                          style={{background:t.accent,color:"#fff",border:"none",borderRadius:8,padding:"6px 10px",fontSize:12,cursor:"pointer"}}>+</button>
+                        <button onClick={()=>setAddingW(null)}
+                          style={{background:"transparent",color:t.muted,border:"none",cursor:"pointer"}}><X size={12}/></button>
+                      </div>
+                    ):(
+                      <div style={{borderTop:`1px solid ${t.border}`,background:t.hover,padding:"5px 12px"}}>
+                        <button onClick={()=>{setAddingW(obj.id);setNewWTitle("");}}
+                          style={{background:"transparent",color:t.muted,border:"none",cursor:"pointer",fontSize:11,display:"flex",alignItems:"center",gap:4,paddingLeft:22}}>
+                          <Plus size={11}/> Ajouter un objectif hebdo
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
           </div>
         );
       })}
