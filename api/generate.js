@@ -1,7 +1,3 @@
-// Fonction serverless Vercel — proxy GRATUIT vers Google Gemini.
-// + Cerveau de Community Manager PRO (systemInstruction).
-// Variable requise : GEMINI_API_KEY (MAJUSCULES)
-
 const CM_BRAIN = `Tu es LE meilleur community manager de France, 10 ans d'expérience, spécialisé dans la téléphonie mobile et les boutiques locales (vente, réparation, reconditionné, accessoires, forfaits).
 
 Tu écris des légendes de posts qui ARRÊTENT le scroll et donnent envie d'agir. Niveau agence premium.
@@ -31,8 +27,8 @@ export default async function handler(req, res) {
   let body = req.body;
   if (typeof body === "string") { try { body = JSON.parse(body); } catch { body = {}; } }
   if (!body) body = {};
-  const userText = (body.messages && body.messages[0] && body.messages[0].content) || "Bonjour";
-  const maxTokens = body.max_tokens || 700;
+  const userText = (body.messages && body.messages[0] && body.messages[0].content) || "Génère une légende";
+  const maxTokens = body.max_tokens || 1500;
 
   const models = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-flash-latest"];
 
@@ -60,7 +56,9 @@ export default async function handler(req, res) {
         const r = await callModel(model);
         const data = await r.json();
         if (r.ok) {
-          const txt = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          // Récupérer TOUTES les parties du texte (pas juste parts[0])
+          const parts = data.candidates?.[0]?.content?.parts || [];
+          const txt = parts.map(p => p.text || "").join("").trim();
           if (txt) return res.status(200).json({ content: [{ type: "text", text: txt }] });
         }
         lastErr = data?.error?.message || `Erreur ${r.status}`;
@@ -68,8 +66,8 @@ export default async function handler(req, res) {
         break;
       }
     }
-    console.error("ERREUR GEMINI (tous modèles):", lastErr);
-    return res.status(503).json({ error: "Gemini occupé, réessaie dans quelques secondes. (" + lastErr + ")" });
+    console.error("ERREUR GEMINI:", lastErr);
+    return res.status(503).json({ error: "Gemini occupé, réessaie dans quelques secondes." });
   } catch (e) {
     console.error("EXCEPTION:", String(e));
     return res.status(500).json({ error: "Exception: " + String(e) });
