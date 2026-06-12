@@ -829,7 +829,7 @@ function CaptionGenerator({stores, t, font, isMobile, onClose}) {
       const resp = await fetch(API_ENDPOINT, {
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ max_tokens:600, messages:[{role:"user",content:prompt}] })
+        body: JSON.stringify({ max_tokens:1500, messages:[{role:"user",content:prompt}] })
       });
       if (!resp.ok) { setError("Le service IA n'est pas configuré (voir README → fonction serverless)."); setLoading(false); return; }
       const data = await resp.json();
